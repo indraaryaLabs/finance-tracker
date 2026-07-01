@@ -149,13 +149,13 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     Berapa estimasi pemasukan bulanan Anda?
                   </h1>
                   <p className="text-[#695D50] text-sm leading-relaxed font-sans">
-                    Data ini digunakan oleh asisten Kala AI untuk menyusun batasan anggaran kategori yang aman dan realistis bagi Anda.
+                    Masukkan perkiraan rata-rata pendapatan Anda. Jika pendapatan Anda tidak tetap (freelancer/pengusaha), Anda tetap bisa mencatat transaksi pemasukan riil di Buku Kas nanti untuk penyesuaian dinamis.
                   </p>
                 </div>
 
                 <div className="space-y-3">
                   <label htmlFor="user-salary" className="text-xs font-semibold text-[#804A30] uppercase tracking-wider block">
-                    Pemasukan Bulanan (Rupiah)
+                    Estimasi Rata-Rata Pemasukan Bulanan (Rupiah)
                   </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#804A30] text-sm font-semibold">

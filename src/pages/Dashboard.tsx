@@ -330,14 +330,16 @@ export default function Dashboard({ onboarding, setOnboarding }: DashboardProps)
   // UTILITY MATHS & STATS CALCULATORS
   // -------------------------------------------------------------
   const balanceStats = () => {
-    const income = transactions
+    const monthlyTxs = transactions.filter((t) => t.date.startsWith(selectedLedgerMonth));
+
+    const income = monthlyTxs
       .filter((t) => t.type === "income")
       .reduce((sum, t) => sum + t.amount, 0);
-    const expense = transactions
+    const expense = monthlyTxs
       .filter((t) => t.type === "expense")
       .reduce((sum, t) => sum + t.amount, 0);
     
-    // Add default salary from onboarding state to simulated income if they just onboarded
+    // Add default salary from onboarding state to simulated income if they have no income transactions this month
     const totalSimulatedIncome = income === 0 && onboarding.salary > 0 
       ? onboarding.salary 
       : income;
@@ -351,7 +353,8 @@ export default function Dashboard({ onboarding, setOnboarding }: DashboardProps)
       income: totalSimulatedIncome,
       expense,
       netBalance,
-      savingsRatio
+      savingsRatio,
+      hasRealIncome: income > 0
     };
   };
 
@@ -915,7 +918,7 @@ export default function Dashboard({ onboarding, setOnboarding }: DashboardProps)
                     {rupiah(stats.income)}
                   </h3>
                   <p className="text-[10px] text-[#695D50]/80">
-                    Termasuk default estimasi gaji
+                    {stats.hasRealIncome ? "Pemasukan riil tercatat bulan ini" : "Menggunakan estimasi rata-rata"}
                   </p>
                 </div>
               </div>
@@ -933,7 +936,7 @@ export default function Dashboard({ onboarding, setOnboarding }: DashboardProps)
                     {rupiah(stats.expense)}
                   </h3>
                   <p className="text-[10px] text-[#695D50]/80 font-mono">
-                    {transactions.filter(t => t.type === 'expense').length} transaksi tercatat
+                    {transactions.filter(t => t.type === 'expense' && t.date.startsWith(selectedLedgerMonth)).length} transaksi bulan ini
                   </p>
                 </div>
               </div>
