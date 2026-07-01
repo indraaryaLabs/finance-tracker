@@ -1,0 +1,6 @@
+{
+  "name": "AI Finance Tracker",
+  "description": "A premium AI-powered personal finance tracker featuring automatic transaction categorization, visual budget targets, and tailored spending advice powered by Gemini.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

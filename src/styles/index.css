@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=JetBrains+Mono:wght@100..800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  --color-brand-primary: #b87352;
+  --color-brand-secondary: #e6dfd5;
+  --color-espresso: #2d1d14;
+  --color-caramel: #cf8a68;
+  --color-cream-bg: #FAF6F0;
+  --color-cream-card: #FCFAF7;
+  
+  --color-coral: #d96a50;
+  --color-forest: #7c9473;
+}
+
+@layer base {
+  body {
+    @apply antialiased text-[#2d1d14] bg-[#FAF6F0] font-sans;
+  }
+}
+
+/* Custom premium scrollbar styling matching coffee theme */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e6dfd5;
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #cf8a68;
+}
+
+/* Glassmorphism utility helpers */
+.glass-panel {
+  background: rgba(252, 250, 247, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(184, 115, 82, 0.08);
+}
+
+.coffee-card-shadow {
+  box-shadow: 0 10px 40px -10px rgba(78, 54, 41, 0.06), 0 2px 10px -2px rgba(78, 54, 41, 0.02);
+}
+
+.coffee-shadow-lg {
+  box-shadow: 0 20px 60px -15px rgba(78, 54, 41, 0.08), 0 4px 15px -3px rgba(78, 54, 41, 0.03);
+}
+
+/* Media print style for professional invoice/ledger printing */
+@media print {
+  /* Set background to clean white and text to solid black */
+  body, html, #application-container, #main-frame {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: Georgia, serif !important;
+  }
+
+  /* Hide headers, footers, charts, advisors, add transaction modal, filters and buttons */
+  header,
+  footer,
+  #desktop-navbar,
+  #sort-block,
+  #filter-block,
+  #open-add-transaction-btn,
+  #ledger-actions-panel button,
+  #ledger-control-bar,
+  #overview-metrics-grid,
+  #central-overview-panels,
+  #dashboard-budgets,
+  #advisor-card,
+  #dashboard-trend-graph,
+  #overlay-transaction-add,
+  .no-print,
+  #reset-profile-btn {
+    display: none !important;
+  }
+
+  /* Expand ledger list container to full page width */
+  #main-frame {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  #ledger-list-container {
+    border: 1px solid #000000 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+  }
+
+  /* Ensure table matches page margins and has visible solid borders */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    border: 1.5px solid #000000 !important;
+  }
+
+  th, td {
+    border: 1px solid #000000 !important;
+    padding: 6px 10px !important;
+    color: #000000 !important;
+    background: transparent !important;
+  }
+
+  th {
+    background-color: #f2f2f2 !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    font-size: 10px !important;
+  }
+
+  /* Hide the action/delete column */
+  .action-col {
+    display: none !important;
+  }
+}
