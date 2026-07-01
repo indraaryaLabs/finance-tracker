@@ -60,7 +60,7 @@ app.post("/api/gemini/categorize", async (req, res) => {
     Choose exactly one short aesthetic tag like: "Lifestyle", "Transit", "Grocery", "Necessity", "Leisure", "Wellness", "Earning", "Growth".`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-2.5-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -137,7 +137,7 @@ app.post("/api/gemini/analyze", async (req, res) => {
     3. Insights: Sebuah array berisi 3-4 rekomendasi berharga (tipe: "critical", "warning", "info", "achievement") yang konkret, tidak sekadar klise seperti "hematlah". Berikan angka spesifik atau analisis taktis.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-2.5-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -213,7 +213,7 @@ app.post("/api/gemini/chat", async (req, res) => {
 
     // Start Chat
     const chat = ai.chats.create({
-      model: "gemini-3.5-flash",
+      model: "gemini-2.5-flash",
       config: {
         systemInstruction,
         temperature: 0.7,
@@ -267,7 +267,7 @@ app.post("/api/gemini/scan-receipt", async (req, res) => {
     };
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-2.5-flash",
       contents: { parts: [imagePart, promptPart] },
       config: {
         responseMimeType: "application/json",
