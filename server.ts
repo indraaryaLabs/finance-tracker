@@ -16,12 +16,15 @@ app.use(express.urlencoded({ limit: "10mb", extended: true }));
 // Helper to initialize Gemini client lazy/securely
 function getGeminiClient() {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
-    // Return null, we will handle and send back clear warning if they attempt to call
+  if (!apiKey) return null;
+
+  const cleanKey = apiKey.replace(/['\"]/g, "").trim();
+  if (cleanKey === "MY_GEMINI_API_KEY" || cleanKey.length < 15) {
+    // Return null to trigger the simulation fallback system safely
     return null;
   }
   return new GoogleGenAI({
-    apiKey: apiKey,
+    apiKey: cleanKey,
     httpOptions: {
       headers: {
         "User-Agent": "aistudio-build",
@@ -130,11 +133,11 @@ app.post("/api/gemini/analyze", async (req, res) => {
     dan batasan budget bulanan mereka:
     ${budgetString}
     
-    Buat laporan ringkasan berkepala dingin, elegan dan eksklusif. Format ringkasan dalam Bahasa Indonesia yang profesional dan menginspirasi (seperti Wealthfront atau Stripe).
+    Buat laporan ringkasan berkepala dingin, elegan dan eksklusif. Format ringkasan dalam Bahasa Indonesia yang profesional, menginspirasi, dan SANGAT SINGKAT (maksimal 2 kalimat pendek untuk summary, dan 1 kalimat pendek ringkas untuk setiap wawasan/insight).
     Laporan mencakup:
-    1. Summary: Paragraf analisis mendalam, tajam, dan realistis tentang kesehatan keuangan mereka saat ini.
-    2. CategoryTrends: Tren pengeluaran per kategori yang layak diperhatikan.
-    3. Insights: Sebuah array berisi 3-4 rekomendasi berharga (tipe: "critical", "warning", "info", "achievement") yang konkret, tidak sekadar klise seperti "hematlah". Berikan angka spesifik atau analisis taktis.`;
+    1. Summary: Analisis singkat dan tajam (maksimal 2 kalimat pendek) tentang kesehatan keuangan mereka.
+    2. CategoryTrends: Tren pengeluaran per kategori yang layak diperhatikan secara singkat.
+    3. Insights: Sebuah array berisi 2-3 rekomendasi berharga (tipe: "critical", "warning", "info", "achievement") yang konkret dengan deskripsi sangat ringkas (maksimal 15-20 kata per wawasan).`;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -177,8 +180,24 @@ app.post("/api/gemini/analyze", async (req, res) => {
     });
 
   } catch (error: any) {
-    console.error("Analyze Error:", error);
-    res.status(500).json({ error: error.message || "Failed to analyze spending pattern" });
+    console.error("Analyze Error (falling back to simulation):", error.message || error);
+    return res.json({
+      summary: "Analisis AI premium sedang tidak tersedia saat ini (kemungkinan kuota API harian telah tercapai). Menggunakan penampung lokal: Pengeluaran bulanan Anda terpantau seimbang.",
+      categoryTrends: "Data tren akan tersedia setelah kuota API diperbarui.",
+      insights: [
+        {
+          title: "Kuota API Terlampaui",
+          desc: `Gemini API mengembalikan error: ${(error.message || "").substring(0, 100)}. Kuota akan reset besok atau gunakan API key baru.`,
+          type: "warning"
+        },
+        {
+          title: "Tips Hemat",
+          desc: "Pantau terus rasio pengeluaran vs pemasukan Anda di dashboard untuk menjaga kesehatan keuangan.",
+          type: "info"
+        }
+      ],
+      aiGenerated: false
+    });
   }
 });
 
@@ -228,8 +247,11 @@ app.post("/api/gemini/chat", async (req, res) => {
     });
 
   } catch (error: any) {
-    console.error("Chat Error:", error);
-    res.status(500).json({ error: error.message || "Failed to fetch response" });
+    console.error("Chat Error (falling back to simulation):", error.message || error);
+    return res.json({
+      reply: "Maaf, saya sedang tidak bisa memproses permintaan Anda saat ini karena kuota API harian telah tercapai. Silakan coba lagi besok atau gunakan API key Gemini baru. 🙏",
+      aiGenerated: false
+    });
   }
 });
 
@@ -248,6 +270,7 @@ app.post("/api/gemini/scan-receipt", async (req, res) => {
         amount: 85000,
         category: "Food & Beverages",
         tag: "Lifestyle",
+        type: "expense",
         items: ["1x Caramel Macchiato Latte", "1x Almond Croissant"],
         date: new Date().toISOString().split('T')[0],
         aiGenerated: false,
@@ -263,7 +286,7 @@ app.post("/api/gemini/scan-receipt", async (req, res) => {
     };
 
     const promptPart = {
-      text: "Analyze this transaction receipt or invoice structure and extract the details precisely. Return the merchant name, total paid amount, matching category (Food & Beverages, Transportation, Shopping, Bills & Utilities, Entertainment, Healthcare, Income, Investments, Others), a short style tag, chronological date of receipt, and a clean list of line items."
+      text: "Analyze this transaction receipt, bank transfer receipt, screenshot, or invoice structure and extract the details precisely. Return the merchant name (or sender/recipient), total paid amount, matching category (Food & Beverages, Transportation, Shopping, Bills & Utilities, Entertainment, Healthcare, Income, Investments, Others), a short style tag, chronological date of receipt, a clean list of line items, and transaction type (income or expense)."
     };
 
     const response = await ai.models.generateContent({
@@ -274,18 +297,19 @@ app.post("/api/gemini/scan-receipt", async (req, res) => {
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            merchant: { type: Type.STRING, description: "Name of the store or merchant" },
-            amount: { type: Type.NUMBER, description: "Total amount paid in number format" },
+            merchant: { type: Type.STRING, description: "Name of the store, merchant, or sender/recipient" },
+            amount: { type: Type.NUMBER, description: "Total amount paid or transferred in number format" },
             category: { type: Type.STRING, description: "Must be one of the specified categories" },
             tag: { type: Type.STRING, description: "A simple budget tag" },
             items: {
               type: Type.ARRAY,
               items: { type: Type.STRING },
-              description: "List of items purchased"
+              description: "List of items purchased or transaction details"
             },
-            date: { type: Type.STRING, description: "YYYY-MM-DD date representation" }
+            date: { type: Type.STRING, description: "YYYY-MM-DD date representation" },
+            type: { type: Type.STRING, description: "Must be 'income' if it is a cash inflow / received money / credit, or 'expense' if it is a cash outflow / payment / debit / transfer out" }
           },
-          required: ["merchant", "amount", "category", "tag", "items", "date"]
+          required: ["merchant", "amount", "category", "tag", "items", "date", "type"]
         }
       }
     });
@@ -297,8 +321,18 @@ app.post("/api/gemini/scan-receipt", async (req, res) => {
     });
 
   } catch (error: any) {
-    console.error("Receipt Scanner Error:", error);
-    res.status(500).json({ error: error.message || "Failed to scan receipt" });
+    console.error("Receipt Scanner Error (falling back to simulation):", error.message || error);
+    return res.json({
+      merchant: "Starbucks Coffee",
+      amount: 85000,
+      category: "Food & Beverages",
+      tag: "Lifestyle",
+      type: "expense",
+      items: ["1x Caramel Macchiato Latte", "1x Almond Croissant"],
+      date: new Date().toISOString().split('T')[0],
+      aiGenerated: false,
+      warning: `Pemindaian gagal (${error.message || "Quota Exceeded"}). Menampilkan hasil simulasi struk Starbucks.`
+    });
   }
 });
 

@@ -1,0 +1,158 @@
+/* ============================================================
+   Print Stylesheet — Format Buku Fisik Profesional
+   Optimized for A4 paper, binding margin left
+   ============================================================ */
+
+@media print {
+  /* Reset everything */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+    font-family: "Georgia", "Times New Roman", serif !important;
+    font-size: 11px !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Page setup */
+  @page {
+    size: A4 portrait;
+    margin: 20mm 15mm 20mm 25mm; /* extra left margin for binding */
+  }
+
+  /* Hide all non-print elements */
+  header,
+  footer,
+  nav,
+  .no-print,
+  [data-no-print],
+  #mobile-nav,
+  #sidebar-nav,
+  button:not(.print-visible),
+  .fixed,
+  .sticky {
+    display: none !important;
+  }
+
+  /* Show print-only elements */
+  .print-only,
+  [data-print-only] {
+    display: block !important;
+  }
+
+  /* Main content */
+  main,
+  #main-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    background: #ffffff !important;
+  }
+
+  /* Tables */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto !important;
+    font-family: "Arial", "Helvetica", sans-serif !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+    page-break-after: auto !important;
+  }
+
+  th {
+    background-color: #f0f0f0 !important;
+    color: #1a1a1a !important;
+    font-weight: bold !important;
+    border: 1px solid #333 !important;
+    padding: 6px 8px !important;
+    font-size: 10px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    font-family: "Georgia", serif !important;
+  }
+
+  td {
+    border: 1px solid #555 !important;
+    padding: 5px 8px !important;
+    font-size: 10.5px !important;
+    color: #1a1a1a !important;
+    background: transparent !important;
+    font-family: "Arial", sans-serif !important;
+  }
+
+  /* Alternating row colors */
+  tbody tr:nth-child(even) td {
+    background-color: #f8f8f8 !important;
+  }
+
+  /* Amount columns */
+  .print-mono,
+  .font-mono {
+    font-family: "Courier New", monospace !important;
+    font-weight: bold !important;
+  }
+
+  /* Income amounts */
+  .print-income {
+    color: #1a6b1a !important;
+  }
+
+  /* Expense amounts */
+  .print-expense {
+    color: #8b1a1a !important;
+  }
+
+  /* Cards → flatten for print */
+  [class*="rounded"],
+  [class*="shadow"],
+  [class*="border"] {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Summary sections */
+  .print-summary {
+    border: 2px solid #333 !important;
+    padding: 12px !important;
+    margin: 16px 0 !important;
+    background: #fafafa !important;
+  }
+
+  .print-summary h3 {
+    font-family: "Georgia", serif !important;
+    font-size: 13px !important;
+    font-weight: bold !important;
+    border-bottom: 1px solid #333 !important;
+    padding-bottom: 4px !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* Page break controls */
+  .print-page-break {
+    page-break-before: always !important;
+  }
+
+  .print-no-break {
+    page-break-inside: avoid !important;
+  }
+
+  /* Hide animations */
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
